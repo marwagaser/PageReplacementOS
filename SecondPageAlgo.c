@@ -1,5 +1,7 @@
-#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+//THE FINAL SUBMISSION ONE
 struct page {
 int pageID;
 int Rbit;
@@ -28,9 +30,12 @@ return true;
 return false;
 }
 
-main (){
-struct page n [3];
+
+int main()
+{
+  struct page n [3];
 struct page pages [15];
+
 
 pages[0].pageID=0;
 pages[0].Rbit=1;
@@ -109,23 +114,25 @@ pages[14].pageID=2;
 pages[14].Atime=25;
 pages[14].Rbit=1;
 pages[14].Mbit=1;
+
 bool flagMR = false;
-bool flagpass2 =true;
 bool flagifexists=false;
-
 int counter =0;
-
+int start;
 n[counter].pageID=pages[0].pageID;
 n[counter].Rbit=pages[0].Rbit;
 n[counter].Mbit=pages [0].Mbit;
 n[counter].Atime=pages[0].Atime;
 counter++;
-printf("page fault: ");
+printf("Page Fault: ");
 printf("%d",pages[0].pageID);
+printf(", at time: ");
+printf("%d",pages[0].Atime);
 printf("\n");
 
 for (int i=1;i<15;i++){
 if (counter==3){
+start=i;
 break;
 }
 if (exists(pages[i].pageID,n,pages[i].Mbit)){
@@ -142,22 +149,19 @@ printf("%d",pages[i].pageID);
 printf("\n");
 }
 }
-bool repeat = false;
-for (int j=3;j<15;j++){
+for (int j=start;j<15;j++){
  flagifexists=false;
  flagMR = false;
- flagpass2 =true;
-bool w = exists(pages[j].pageID,n,pages[j].Mbit);
-if (w){
-flagifexists=true;
-//printf("%s\n","5 here");
-}
-
-if(flagifexists==false){
-//printf("%s\n","hi");
+ bool w = exists(pages[j].pageID,n,pages[j].Mbit);
+ if(w==1){
+ flagifexists=true;
+ continue;
+ }
+ else{
 for (int h=0;h<3;h++){
+
 if (n[h].Rbit==0&&n[h].Mbit==0&&flagMR==false){
-//printf("%d\n",pages[j].pageID);
+
 int u =n[h].pageID;
 n[h].pageID=pages[j].pageID;
 n[h].Rbit =pages[j].Rbit;
@@ -165,53 +169,66 @@ n[h].Mbit = pages[j].Mbit;
 n[h].Atime= pages[j].Atime;
 qsort(n, 3, sizeof(struct page), compare);
 flagMR=true;
-flagpass2=false;
-qsort(n, 3, sizeof(struct page), compare);
-printf("page fault: ");
-printf("%d",pages[j].pageID);
-printf(" removes ");
-printf("%d",u);
-printf("\n");
-
-}
-}
-}
-if (flagifexists==false&&flagMR==false){
-for (int q=0;q<3;q++){
-if (n[q].Rbit==0&&flagpass2==true){
-
-int u=n[q].pageID;
-n[q].pageID=pages[j].pageID;
-n[q].Rbit =pages[j].Rbit;
-n[q].Mbit = pages[j].Mbit;
-n[q].Atime= pages[j].Atime;
-flagpass2 =false;
-
-qsort(n, 3, sizeof(struct page), compare);
-
-printf("page fault: ");
+printf("page fault at mr first: ");
 printf("%d",pages[j].pageID);
 printf(" removes ");
 printf("%d",u);
 printf("\n");
 }
 else {
-n[q].Rbit=0;
+if (flagMR==false){
+n[h].Rbit =0;
+printf("%d",n[h].pageID);
+printf(" ");
+printf("the bit was changed to 0\n");
 }
 }
-if (flagpass2==true){
-if (pages[j].pageID==6){
-printf("marwa");
 }
-j=j-1;
+if(flagMR==false){//still false no 0,0 found
+//loop again search for 0,0
 
-}
-}
-}
+for (int q=0;q<3;q++){
+if (n[q].Rbit==0&&n[q].Mbit==0&&flagMR==false){//&&flagpass2==true)
+int u=n[q].pageID;
+n[q].pageID=pages[j].pageID;
+n[q].Rbit =pages[j].Rbit;
+n[q].Mbit = pages[j].Mbit;
+n[q].Atime= pages[j].Atime;
+flagMR=true;
 qsort(n, 3, sizeof(struct page), compare);
-for (int p1=0;p1<3;p1++){
-printf("%d\n",n[p1].pageID);
+printf("page fault at second pass: ");
+printf("%d",pages[j].pageID);
+printf(" removes ");
+printf("%d",u);
+printf("\n");
+}
 }
 
+if(flagMR==false){ //still no 0,0 remove ba2a awl haga
+int u=n[0].pageID;
+n[0].pageID=pages[j].pageID;
+n[0].Rbit =pages[j].Rbit;
+n[0].Mbit = pages[j].Mbit;
+n[0].Atime= pages[j].Atime;
+flagMR=true;
+qsort(n, 3, sizeof(struct page), compare);
+printf("page fault give up: ");
+printf("%d",pages[j].pageID);
+printf(" removes ");
+printf("%d",u);
+printf("\n");
+
+}
+
+}
+ }
+
+}
+printf("The pages in the page frame are: ");
+for (int p1=0;p1<3;p1++){
+printf("%d",n[p1].pageID);
+printf(" ");
+}
+printf("----DONE----");
 }
 
